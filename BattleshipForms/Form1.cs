@@ -22,13 +22,13 @@ namespace BattleshipForms
             bool Valido = true;
             if (mapa[x, y] != 0) Valido = false;
             if (mapa[(x == 0 ? 1 : x) - 1, (y == 5 ? 4 : y) + 1] != 0) Valido = false;
-            if (mapa[x, (y == 5 ? 4 : y) + 1] != 0) Valido = false;
             if (mapa[(x == 5 ? 4 : x) + 1, (y == 5 ? 4 : y) + 1] != 0) Valido = false;
+            if (mapa[(x == 0 ? 1 : x) - 1, (y == 0 ? 1 : y) - 1] != 0) Valido = false;
+            if (mapa[(x == 5 ? 4 : x) + 1, (y == 0 ? 1 : y) - 1] != 0) Valido = false;
+            if (mapa[x, (y == 5 ? 4 : y) + 1] != 0) Valido = false;
             if (mapa[(x == 0 ? 1 : x) - 1, y] != 0) Valido = false;
             if (mapa[(x == 5 ? 4 : x) + 1, y] != 0) Valido = false;
-            if (mapa[(x == 0 ? 1 : x) - 1, (y == 0 ? 1 : y) - 1] != 0) Valido = false;
             if (mapa[x, (y == 0 ? 1 : y) - 1] != 0) Valido = false;
-            if (mapa[(x == 5 ? 4 : x) + 1, (y == 0 ? 1 : y) - 1] != 0) Valido = false;
             return Valido;
         }
 
@@ -73,7 +73,6 @@ namespace BattleshipForms
                             mapa[x, y] = 30;
                             if (x == 5) mapa[x - 1, y] = 30;
                             else mapa[x + 1, y] = 30;
-
                         }
                         else
                         {
