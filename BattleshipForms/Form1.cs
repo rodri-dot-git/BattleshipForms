@@ -1,13 +1,5 @@
 ﻿using BattleshipForms.Properties;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace BattleshipForms
@@ -22,104 +14,98 @@ namespace BattleshipForms
             InitializeComponent();
             IniciarPartida();
         }
-
+        bool ValidarEspacio(int x, int y)
+        {
+            bool Valido = true;
+            if (mapa[x, y] != 0) Valido = false;
+            if (mapa[(x == 0 ? 1 : x) - 1, (y == 5 ? 4 : y) + 1] != 0) Valido = false;
+            if (mapa[x, (y == 5 ? 4 : y) + 1] != 0) Valido = false;
+            if (mapa[(x == 5 ? 4 : x) + 1, (y == 5 ? 4 : y) + 1] != 0) Valido = false;
+            if (mapa[(x == 0 ? 1 : x) - 1, y] != 0) Valido = false;
+            if (mapa[(x == 5 ? 4 : x) + 1, y] != 0) Valido = false;
+            if (mapa[(x == 0 ? 1 : x) - 1, (y == 0 ? 1 : y) - 1] != 0) Valido = false;
+            if (mapa[x, (y == 0 ? 1 : y) - 1] != 0) Valido = false;
+            if (mapa[(x == 5 ? 4 : x) + 1, (y == 0 ? 1 : y) - 1] != 0) Valido = false;
+            return Valido;
+        }
+        bool ValidarEspacioBarco(int x, int y)
+        {
+            bool Valido = ValidarEspacio(x, y);
+            if (x == 5) x--;
+            else x++;
+            if (y == 5) y--;
+            else y++;
+            return Valido && ValidarEspacio(x, y);
+        }
         void IniciarPartida()
         {
             mapa = new int[6, 6];
             Random random = new Random();
-            Metodos m = new Metodos();
             puntuacion = 100;
-            label2.Text = "100";
+            label2.Text = puntuacion.ToString();
             BarcosGolpeados = 0;
-            while (m.CantidadBarcos != 3 || m.CantidadIslas != 2 || m.CantidadFosas != 1)
+            int x, y, orientation;
+            bool LugarDisponible;
+            for (int i = 0; i < 3; i++)
             {
-                int x, y, orientation;
-                bool LugarDisponible = false;
+                LugarDisponible = false;
                 while (!LugarDisponible)
                 {
-                    int aux = m.ValorParaMapa();
-                    if (aux == 30)
+                    x = random.Next(0, 6);
+                    y = random.Next(0, 6);
+                    orientation = random.Next(0, 2);
+                    if (ValidarEspacioBarco(x, y))
                     {
-                        x = random.Next(1, 6);
-                        y = random.Next(1, 6);
-                        orientation = random.Next(0, 2);
-                        if (mapa[x, y] == 0)
+                        LugarDisponible = true;
+                        if (orientation == 0)
                         {
-                            try
-                            {
-                                if (
-                                mapa[x - 1, y + 1] <= 0 ||
-                                mapa[x, y + 1] <= 0 ||
-                                mapa[x + 1, y + 1] <= 0 ||
-                                mapa[x - 1, y] <= 0 ||
-                                mapa[x, y] <= 0 ||
-                                mapa[x + 1, y] <= 0 ||
-                                mapa[x - 1, y - 1] <= 0 ||
-                                mapa[x, y - 1] <= 0 ||
-                                mapa[x + 1, y - 1] <= 0
-                                )
-                                {
-                                    if (orientation == 0)
-                                    {
-                                        mapa[x, y] = 30;
-                                        mapa[x + 1, y] = 30;
-                                    }
-                                    else
-                                    {
-                                        mapa[x, y] = 30;
-                                        mapa[x, y - 1] = 30;
-                                    }
-                                    LugarDisponible = true;
-                                }
-                            }
-                            catch (Exception)
-                            {
-                                m.CantidadBarcos--;
-                            }
+                            mapa[x, y] = 30;
+                            if (x == 5) mapa[x - 1, y] = 30;
+                            else mapa[x + 1, y] = 30;
+
                         }
-
-                    }
-                    else if (aux >= -1)
-                    {
-                        x = random.Next(1, 6);
-                        y = random.Next(1, 6);
-                        if (mapa[x, y] == 0)
+                        else
                         {
-                            try
-                            {
-                                if (
-                                mapa[x - 1, y + 1] != 30 ||
-                                mapa[x, y + 1] != 30 ||
-                                mapa[x + 1, y + 1] != 30 ||
-                                mapa[x - 1, y] != 30 ||
-                                mapa[x, y] != 30 ||
-                                mapa[x + 1, y] != 30 ||
-                                mapa[x - 1, y - 1] != 30 ||
-                                mapa[x, y - 1] != 30 ||
-                                mapa[x + 1, y - 1] != 30
-                                )
-                                {
-                                    mapa[x, y] = aux;
-                                    LugarDisponible = true;
-                                }
-                            }
-                            catch (Exception)
-                            {
-                                if (aux == -1) m.CantidadFosas--;
-                                if (aux == 50) m.CantidadIslas--;
-                            }
-
+                            mapa[x, y] = 30;
+                            if (y == 5) mapa[x, y - 1] = 30;
+                            else mapa[x, y + 1] = 30;
                         }
                     }
                 }
             }
-            for (int x = 0; x < 6; x++)
+            for (int i = 0; i < 2; i++)
             {
-                for (int y = 0; y < 6; y++)
+                LugarDisponible = false;
+                while (!LugarDisponible)
+                {
+                    x = random.Next(0, 6);
+                    y = random.Next(0, 6);
+                    if (ValidarEspacio(x, y))
+                    {
+                        LugarDisponible = true;
+                        mapa[x, y] = 50;
+                    }
+                }
+            }
+            LugarDisponible = false;
+            while (!LugarDisponible)
+            {
+                x = random.Next(0, 6);
+                y = random.Next(0, 6);
+                if (ValidarEspacio(x, y))
+                {
+                    LugarDisponible = true;
+                    mapa[x, y] = -1;
+                }
+            }
+            for (x = 0; x < 6; x++)
+            {
+                for (y = 0; y < 6; y++)
                 {
                     if (mapa[x, y] == 0) mapa[x, y] = -20;
                     var button = (Button)this.Controls[$"btn{x}{y}"];
                     button.Image = Resources.question;
+                    button.Enabled = true;
                 }
             }
 
@@ -128,10 +114,11 @@ namespace BattleshipForms
         private void ButtonClick(object sender, EventArgs e)
         {
             Button b = sender as Button;
+            b.Enabled = false;
             string xy = b.Name.Substring(3);
             int x = int.Parse(xy) / 10;
             int y = int.Parse(xy) - (x * 10);
-            int aux = RevisaCelda(x, y);
+            int aux = mapa[x, y];
             switch (aux)
             {
                 case 30:
@@ -162,7 +149,6 @@ namespace BattleshipForms
                 MessageBox.Show("Ganaste", "Se acabo el juego");
                 MostrarMapa();
             }
-            b.Enabled = false;
         }
 
         void MostrarMapa()
@@ -192,11 +178,6 @@ namespace BattleshipForms
                     b.Enabled = false;
                 }
             }
-        }
-
-        int RevisaCelda(int x, int y)
-        {
-            return mapa[x, y];
         }
 
         private void iniciarToolStripMenuItem_Click(object sender, EventArgs e)
