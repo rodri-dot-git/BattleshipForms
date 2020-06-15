@@ -12,8 +12,11 @@ namespace BattleshipForms
         public Form1()
         {
             InitializeComponent();
+            // Funcion para crear el mapa y restablecer los valores
             IniciarPartida();
         }
+        // Funcion para validar que el espacio este vacio y que no haya
+        // ningun valor en los cuadros adyacentes
         bool ValidarEspacio(int x, int y)
         {
             bool Valido = true;
@@ -28,6 +31,8 @@ namespace BattleshipForms
             if (mapa[(x == 5 ? 4 : x) + 1, (y == 0 ? 1 : y) - 1] != 0) Valido = false;
             return Valido;
         }
+
+        // Los barcos usan dos espacios asi que hay que revisar ambos valores
         bool ValidarEspacioBarco(int x, int y)
         {
             bool Valido = ValidarEspacio(x, y);
@@ -39,24 +44,30 @@ namespace BattleshipForms
         }
         void IniciarPartida()
         {
+            // reestablecemos el mapa en 0
             mapa = new int[6, 6];
             Random random = new Random();
+            // puntuacion base
             puntuacion = 100;
             label2.Text = puntuacion.ToString();
+            // reestablecemos
             BarcosGolpeados = 0;
             int x, y, orientation;
             bool LugarDisponible;
+            // Asignamos aleatoriamente los barcos
             for (int i = 0; i < 3; i++)
             {
                 LugarDisponible = false;
                 while (!LugarDisponible)
                 {
+                    // va a buscar un ligar aleatorio que sea valido
                     x = random.Next(0, 6);
                     y = random.Next(0, 6);
                     orientation = random.Next(0, 2);
                     if (ValidarEspacioBarco(x, y))
                     {
                         LugarDisponible = true;
+                        // Para ponerlos en verticalo u horizontal
                         if (orientation == 0)
                         {
                             mapa[x, y] = 30;
@@ -73,6 +84,8 @@ namespace BattleshipForms
                     }
                 }
             }
+
+            // Asignar las islas, igual que los barcos
             for (int i = 0; i < 2; i++)
             {
                 LugarDisponible = false;
@@ -87,6 +100,8 @@ namespace BattleshipForms
                     }
                 }
             }
+
+            // Asignar la fosa marina
             LugarDisponible = false;
             while (!LugarDisponible)
             {
@@ -98,6 +113,8 @@ namespace BattleshipForms
                     mapa[x, y] = -1;
                 }
             }
+
+            // Poner las imagenes de "?" para "ocultar" los valores
             for (x = 0; x < 6; x++)
             {
                 for (y = 0; y < 6; y++)
@@ -111,6 +128,7 @@ namespace BattleshipForms
 
         }
 
+        // Funcion que revisa el valor del arreglo y asigna la imagen correspondiente
         void SustituirImagen(int valor, Button b)
         {
             switch (valor)
@@ -132,6 +150,9 @@ namespace BattleshipForms
                     break;
             }
         }
+
+        // Accion que al hacer click revisa donde hiciste click
+        // y asigna los valores correspondientes
         private void ButtonClick(object sender, EventArgs e)
         {
             Button b = sender as Button;
@@ -141,6 +162,7 @@ namespace BattleshipForms
             int y = int.Parse(xy) - (x * 10);
             int aux = mapa[x, y];
             SustituirImagen(aux, b);
+            // Si es la fosa pon un valor negativo para acabar el jeugo
             puntuacion += aux == -1 ? -1000 : aux;
             label2.Text = puntuacion.ToString();
             if (puntuacion <= 0)
@@ -155,6 +177,7 @@ namespace BattleshipForms
             }
         }
 
+        // Funcion para mostrar los valores del mapa
         void MostrarMapa()
         {
             for (int x = 0; x < 6; x++)
