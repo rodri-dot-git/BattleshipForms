@@ -111,15 +111,9 @@ namespace BattleshipForms
 
         }
 
-        private void ButtonClick(object sender, EventArgs e)
+        void SustituirImagen(int valor, Button b)
         {
-            Button b = sender as Button;
-            b.Enabled = false;
-            string xy = b.Name.Substring(3);
-            int x = int.Parse(xy) / 10;
-            int y = int.Parse(xy) - (x * 10);
-            int aux = mapa[x, y];
-            switch (aux)
+            switch (valor)
             {
                 case 30:
                     BarcosGolpeados++;
@@ -137,6 +131,16 @@ namespace BattleshipForms
                 default:
                     break;
             }
+        }
+        private void ButtonClick(object sender, EventArgs e)
+        {
+            Button b = sender as Button;
+            b.Enabled = false;
+            string xy = b.Name.Substring(3);
+            int x = int.Parse(xy) / 10;
+            int y = int.Parse(xy) - (x * 10);
+            int aux = mapa[x, y];
+            SustituirImagen(aux, b);
             puntuacion += aux == -1 ? -1000 : aux;
             label2.Text = puntuacion.ToString();
             if (puntuacion <= 0)
@@ -158,23 +162,7 @@ namespace BattleshipForms
                 for (int y = 0; y < 6; y++)
                 {
                     var b = (Button)this.Controls[$"btn{x}{y}"];
-                    switch (mapa[x, y])
-                    {
-                        case 30:
-                            b.Image = Resources.battleship;
-                            break;
-                        case 50:
-                            b.Image = Resources.island;
-                            break;
-                        case -1:
-                            b.Image = Resources.mystery;
-                            break;
-                        case -20:
-                            b.Image = Resources.sea;
-                            break;
-                        default:
-                            break;
-                    }
+                    SustituirImagen(mapa[x, y], b);
                     b.Enabled = false;
                 }
             }
